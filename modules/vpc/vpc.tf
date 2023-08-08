@@ -45,6 +45,24 @@ resource "google_compute_subnetwork" "private_subnet" {
   }
 }
 
+# Private services IP
+resource "google_compute_global_address" "private_ip_address" {
+  name          = "${var.company}-${var.env}-private-services-address"
+  purpose       = "VPC_PEERING"
+  address_type  = "INTERNAL"
+  network       = google_compute_network.network.id
+  address       = "${var.pri_vpc_peering_address}"
+  prefix_length = 24
+  depends_on    = [google_compute_subnetwork.private_subnet]
+}
+# Private VPC connector
+resource "google_service_networking_connection" "private_vpc_connection" {
+  network                 = google_compute_network.network.id
+  service                 = "servicenetworking.googleapis.com"
+  reserved_peering_ranges = [google_compute_global_address.private_ip_address.name]
+  depends_on              = [google_compute_global_address.private_ip_address]
+}
+
 # Router
 resource "google_compute_router" "router" {
   name    = "${google_compute_network.network.name}-nat-router"

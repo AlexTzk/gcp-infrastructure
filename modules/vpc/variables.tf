@@ -12,3 +12,4 @@ variable "auto_create_subnetworks" {}
 variable "region" {}
 variable "pub_subnet_cidr" {}
 variable "pri_subnet_cidr" {}
+variable "pri_vpc_peering_address" {}
