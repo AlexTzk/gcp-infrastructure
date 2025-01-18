@@ -44,6 +44,9 @@ Thumbs.db
 # ENVs
 *.env
 
+# KEYS
+*.key
+
 # JSON
 *.json
 
