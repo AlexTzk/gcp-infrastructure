@@ -1,0 +1,18 @@
+# General
+project = "YOUR_PROJECT"
+region = "europe-west2" 
+env = "dev"
+company = "mycompany"
+
+# Network
+network_name = "mynet"
+routing_mode = "GLOBAL"
+description = "test"
+mtu = "1460"
+zone = "europe-west2-a"
+pri_subnet_cidr = "10.16.0.0/22"
+pri_vpc_peering_address = "10.16.5.0"
+# shared_vpc_host = false
+
+# GKE
+gke_cluster_ipv4_cidr = "10.11.0.0/21"
