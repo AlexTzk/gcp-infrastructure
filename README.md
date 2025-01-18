@@ -2,6 +2,11 @@
 
 A repository for automating the deployment and management of Google Cloud Platform (GCP) resources. This project aims to provide a scalable, maintainable, and reproducible infrastructure setup using Infrastructure as Code (IaC) principles.
 
+## Architecture Diagram
+![Architecture](https://github.com/user-attachments/assets/5565533a-381b-426e-aecf-c408a8dc8159)
+
+---
+
 ## Table of Contents
 
 - [Overview](#overview)
