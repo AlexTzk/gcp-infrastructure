@@ -1,36 +1,35 @@
 # VPC
 resource "google_compute_network" "network" {
   name                            = "${var.network_name}-${var.env}-${var.company}"
-  auto_create_subnetworks         = "${var.auto_create_subnetworks}"
+  auto_create_subnetworks         =  false
   routing_mode                    = "${var.routing_mode}"
   project                         = "${var.project}"
   description                     = "${var.description}"
-  delete_default_routes_on_create = "${var.delete_default_internet_gateway_routes}"
   mtu                             = "${var.mtu}"
 }
 
-#	Shared VPC
-resource "google_compute_shared_vpc_host_project" "shared_vpc_host" {
+#	Shared VPC block for connecting other Google projects
+# # A host project provides network resources to associated service projects
+/*resource "google_compute_shared_vpc_host_project" "shared_vpc_host" {
   provider = google-beta
   count      = "${var.shared_vpc_host}" ? 1 : 0
   project    = "${var.project}"
   depends_on = [google_compute_network.network]
 }
 
-# Subnets
-resource "google_compute_subnetwork" "public_subnet" {
-  name          = "${var.network_name}-${var.env}-${var.company}-public"
-  ip_cidr_range = "${var.pub_subnet_cidr}"
-  network       = google_compute_network.network.id
-  region        = "${var.region}"
-  depends_on    = [google_compute_network.network]
-  log_config {
-    aggregation_interval = "INTERVAL_10_MIN"
-    flow_sampling        = 0.5
-    metadata             = "INCLUDE_ALL_METADATA"
-    filter_expr          = "true"
-  }
+# A service project gains access to network resources provided by its
+# associated host project.
+resource "google_compute_shared_vpc_service_project" "service1" {
+  host_project    = google_compute_shared_vpc_host_project.host.project
+  service_project = "service-project-id-1"
 }
+
+resource "google_compute_shared_vpc_service_project" "service2" {
+  host_project    = google_compute_shared_vpc_host_project.host.project
+  service_project = "service-project-id-2"
+}*/
+
+# Subnet - if exposing VMs or DBs would recommend cloning the block below for a public subnet along with firewall rules
 resource "google_compute_subnetwork" "private_subnet" {
   name          = "${var.network_name}-${var.env}-${var.company}-private"
   ip_cidr_range = "${var.pri_subnet_cidr}"
@@ -41,11 +40,10 @@ resource "google_compute_subnetwork" "private_subnet" {
     aggregation_interval = "INTERVAL_15_MIN"
     flow_sampling        = 0.5
     metadata             = "INCLUDE_ALL_METADATA"
-    filter_expr          = "true"
   }
 }
 
-# Private services IP
+# VPC peer - can use private service connect instead but VPC peering worked great so far for me
 resource "google_compute_global_address" "private_ip_address" {
   name          = "${var.company}-${var.env}-private-services-address"
   purpose       = "VPC_PEERING"
@@ -55,6 +53,7 @@ resource "google_compute_global_address" "private_ip_address" {
   prefix_length = 24
   depends_on    = [google_compute_subnetwork.private_subnet]
 }
+
 # Private VPC connector
 resource "google_service_networking_connection" "private_vpc_connection" {
   network                 = google_compute_network.network.id
@@ -70,11 +69,17 @@ resource "google_compute_router" "router" {
   region  = "${var.region}"
 }
 
-# Cloud NAT IPs
+# Cloud NAT IPs - configured as one but can expand 
 resource "google_compute_address" "address" {
-  count  = 2
+  count  = 1
   name   = "nat-manual-ip-${count.index}"
   region = "${var.region}"
+  depends_on = [google_compute_router.router]
+}
+
+# Global Load balancer IP
+resource "google_compute_global_address" "loadbalancer_ip" {
+  name   = "${var.company}-${var.env}-lb-ip"
   depends_on = [google_compute_router.router]
 }
 

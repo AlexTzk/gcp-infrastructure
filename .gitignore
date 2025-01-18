@@ -63,3 +63,6 @@ Thumbs.db
 *.mov
 *.wmv
 
+# sensitive
+*.key
+*.pem
