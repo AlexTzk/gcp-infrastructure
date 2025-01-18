@@ -48,7 +48,7 @@ Thumbs.db
 *.key
 
 # JSON
-*.json
+/modules/iam/*.json
 
 # Applications
 *.app
