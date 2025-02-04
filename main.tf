@@ -7,7 +7,7 @@ provider "google" {
 # Create a bucket called $project-tfstate for storing the Terraform states prior to everything else #
 terraform {
   backend "gcs" {
-    bucket  = "YOUR_PROJECT-tfstate"
+    bucket  = "awesome-project-123456-tfstate"
     prefix  = "terraform/state"
   }
 }
@@ -31,6 +31,7 @@ module "project-services" {
     "iap.googleapis.com",
     "run.googleapis.com",
     "sql-component.googleapis.com",
+    "sqladmin.googleapis.com",
     "storage.googleapis.com"
   ])
 }
@@ -67,4 +68,37 @@ module "iam"{
   project                                = "${var.project}"
   region                                 = "${var.region}"
 }
-
+# SQL
+module "sql" {
+  source                                 = "./modules/sql"
+  company                                = "${var.company}"
+  project 				                       = "${var.project}"
+  env                                    = "${var.env}"
+  region                                 = "${var.region}"
+  zone                                   = "${var.zone}"
+  db_tier                                = "${var.db_tier}"
+  db_availability_type                   = "${var.db_availability_type}"
+  db_version                             = "${var.db_version}"
+  db_disk_size                           = "${var.db_disk_size}"
+  db_disk_type                           = "${var.db_disk_type}"
+  db_deletion                            = "${var.db_deletion}"
+  db_point_recovery                      = "${var.db_point_recovery}"
+  db_name                                = "${var.db_name}"
+  db_user_1                              = "${var.db_user_1}"
+  db_password_1                          = "${var.db_password_1}"
+  network_id                             =  module.network.network_id
+  depends_on                             = [module.network]
+}
+# GCE
+module "gce" {
+  source                                 = "./modules/gce"
+  company                                = "${var.company}"
+  project 				                       = "${var.project}"
+  env                                    = "${var.env}"
+  region                                 = "${var.region}"
+  zone                                   = "${var.zone}"
+  vm_ip_nfs                              = "${var.vm_ip_nfs}"
+  network_id                             =  module.network.network_id
+  privatenetwork_subnet                  =  module.network.privatenetwork_subnet
+  depends_on                             = [module.network]
+}
