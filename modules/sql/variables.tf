@@ -14,5 +14,3 @@ variable "db_deletion" {}
 variable "db_name" {}
 variable "db_user_1" {}
 variable "db_password_1" {}
-variable "db_user_2" {}
-variable "db_password_2" {}
