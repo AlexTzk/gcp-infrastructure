@@ -5,14 +5,29 @@ env = "dev"
 company = "mycompany"
 
 # Network
-network_name = "mynet"
-routing_mode = "GLOBAL"
+network_name = "mynet" # VPC NAME
+routing_mode = "GLOBAL" # REGIONAL or GLOBAL 
 description = "test"
 mtu = "1460"
-zone = "europe-west2-a"
-pri_subnet_cidr = "10.16.0.0/22"
-pri_vpc_peering_address = "10.16.5.0"
+zone = "europe-west2-a" 
+pri_subnet_cidr = "10.16.0.0/22" # VPC SUBNET
+pri_vpc_peering_address = "10.16.5.0" 
 # shared_vpc_host = false
+
+# GCE (compute engine)
+vm_ip_nfs = "10.16.0.10" # IPV4 private IP address for Virtual machine
+
+# PostgreSQL
+db_version = "POSTGRES_17" # postgres version
+db_tier = "db-custom-2-7680" # machine type
+db_availability_type = "REGIONAL" # REGIONAL for HA / ZONAL for single zone
+db_disk_size = "250" # 500G will provide max IOps
+db_disk_type = "PD_SSD" # PD_SSD / PD_HDD
+db_point_recovery = "true" # Required for HA
+db_deletion = "false" # Protect against accidental deletion, set to true to enable
+db_name = "myfirstdatabase" # Create a DB
+db_user_1 = "awesomeuser" # Create a USER
+db_password_1 = "awesomeuserpassword" # Create a password
 
 # GKE
 gke_cluster_ipv4_cidr = "10.11.0.0/21"

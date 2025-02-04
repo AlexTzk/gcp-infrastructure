@@ -10,3 +10,14 @@ variable "zone" {}
 variable "pri_subnet_cidr" {}
 variable "pri_vpc_peering_address" {}
 variable "gke_cluster_ipv4_cidr" {}
+variable "db_version" {}
+variable "db_tier" {}
+variable "db_availability_type" {} # REGIONAL for HA / ZONAL for single zone
+variable "db_disk_size" {}
+variable "db_disk_type"{} # PD_SSD / PD_HDD
+variable "db_point_recovery" {} # Required for HA
+variable "db_deletion" {}
+variable "db_name" {}
+variable "db_user_1" {}
+variable "db_password_1" {}
+variable "vm_ip_nfs" {}
