@@ -46,14 +46,24 @@ GCP APIs needed for deploying this infrastructure are enabled at the beginning. 
 │   │   ├── iam.tf
 │   │   ├── outputs.tf
 │   │   └── variables.tf
-│   └── vpc
+│   ├── vpc
+│   │   ├── outputs.tf
+│   │   ├── variables.tf
+│   │   └── vpc.tf
+│   ├── gce
+│   │   ├── outputs.tf
+│   │   ├── variables.tf
+│   │   ├── startup_nfs.sh
+│   │   └── gce.tf
+│   └── sql
 │       ├── outputs.tf
 │       ├── variables.tf
-│       └── vpc.tf
+│       └── sql.tf
 ├── outputs.tf
-├── plan.json
+├── plan_p1.json
+├── plan_p2.json
 ├── terraform.tfvars_example
-└── variables.tf``
+└── variables.tf
 ```
 
 ## Contents
