@@ -61,6 +61,15 @@ resource "google_compute_instance" "bastion-nfs" {
 
   tags = ["allow-ssh", "allow-gke"]
   zone = "${var.zone}"
+  
+  service_account {
+    email  = "${var.nfs_service_account}"
+    scopes = [
+      "https://www.googleapis.com/auth/compute.readonly", 
+      "https://www.googleapis.com/auth/logging.write"       # for writing logs
+    ]
+  }
+ 
 }
 
 # Grant user access to bastion host

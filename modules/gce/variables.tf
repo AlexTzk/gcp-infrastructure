@@ -6,3 +6,4 @@ variable "vm_ip_nfs" {}
 variable "network_id" {}
 variable "zone" {}
 variable "privatenetwork_subnet" {}
+variable "nfs_service_account" {}

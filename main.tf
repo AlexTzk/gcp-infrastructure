@@ -98,6 +98,7 @@ module "gce" {
   region                                 = "${var.region}"
   zone                                   = "${var.zone}"
   vm_ip_nfs                              = "${var.vm_ip_nfs}"
+  nfs_service_account                    =  module.iam.nfs_service_account
   network_id                             =  module.network.network_id
   privatenetwork_subnet                  =  module.network.privatenetwork_subnet
   depends_on                             = [module.network]
