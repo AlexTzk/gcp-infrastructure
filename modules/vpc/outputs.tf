@@ -17,6 +17,6 @@ output "privatenetwork_subnet" {
 output "NAT-IPs" {
   value       = google_compute_address.address.*.address
 }
-output "LB-IP" {
+output "LB_IP" {
   value       = google_compute_global_address.loadbalancer_ip.address
 }

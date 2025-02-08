@@ -1,11 +1,11 @@
 #!/bin/bash
-set -e  # Exit script on any error
-set -x  # Print commands for debugging
+set +e
+set -x
 
 LOGFILE="/var/log/startupscript.log"
-exec > >(tee -a "$LOGFILE") 2>&1
+exec > >(sudo tee -a "$LOGFILE") 2>&1
 
-# Update system
+# Update and install 
 sudo apt-get update -y
 sudo apt-get install -y nfs-kernel-server mdadm apt-transport-https ca-certificates gnupg curl
 
@@ -17,9 +17,11 @@ if ! grep -qs "/dev/md127" /etc/fstab; then
     sudo mkfs.ext4 -F /dev/md127
 fi
 
-# Mounting RAID
+# Mounting RAID Array
 sudo mkdir -p /data
-echo "/dev/md127 /data ext4 defaults 0 0" | sudo tee -a /etc/fstab
+if ! grep -qs "/dev/md127" /etc/fstab; then
+    echo "/dev/md127 /data ext4 defaults 0 0" | sudo tee -a /etc/fstab
+fi
 sudo mount -a
 sudo chown -R nobody:nogroup /data
 sudo chmod -R 777 /data
@@ -30,28 +32,26 @@ sudo systemctl restart nfs-kernel-server
 sudo exportfs -a
 sudo systemctl enable nfs-server
 
-# Add Google Cloud SDK
-if ! command -v gcloud &> /dev/null; then
-    echo "Installing Google Cloud SDK..."
-    curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo gpg --dearmor -o /usr/share/keyrings/cloud.google.gpg
-    echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee /etc/apt/sources.list.d/google-cloud-sdk.list
-    sudo apt-get update -y
-    sudo apt-get install -y google-cloud-cli kubectl google-cloud-sdk-gke-gcloud-auth-plugin
-fi
+# install Google Cloud SDK 
+echo "Installing Google Cloud SDK and dependencies..."
+sudo apt-get install -y apt-transport-https ca-certificates gnupg curl
 
-# Install Terraform
-if ! command -v terraform &> /dev/null; then
-    sudo snap install terraform --classic
-fi
+curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo gpg --dearmor -o /usr/share/keyrings/cloud.google.gpg
+echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee /etc/apt/sources.list.d/google-cloud-sdk.list
 
-# Update GRUB
+sudo apt-get update -y
+sudo apt-get install -y google-cloud-cli kubectl google-cloud-sdk-gke-gcloud-auth-plugin
+
+# Install Terraform via Snap
+sudo snap install terraform --classic
+
+# Update GRUB configuration
 if ! grep -q 'scsi_mod.use_blk_mq=Y' /etc/default/grub; then
     sudo sed -i 's/GRUB_CMDLINE_LINUX=""/GRUB_CMDLINE_LINUX="scsi_mod.use_blk_mq=Y"/g' /etc/default/grub
     sudo update-grub
 fi
 
-# Disable Google startup scripts and reboot
+# Disable Google startup scripts and schedule reboot
 sudo systemctl disable google-startup-scripts
-nohup bash -c "sleep 5 && reboot" &
-
+nohup bash -c "sleep 5 && sudo reboot" &
 echo "Startup script execution completed!"

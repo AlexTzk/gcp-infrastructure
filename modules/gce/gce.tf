@@ -65,8 +65,7 @@ resource "google_compute_instance" "bastion-nfs" {
   service_account {
     email  = "${var.nfs_service_account}"
     scopes = [
-      "https://www.googleapis.com/auth/compute.readonly", 
-      "https://www.googleapis.com/auth/logging.write"       # for writing logs
+      "https://www.googleapis.com/auth/cloud-platform"
     ]
   }
  
@@ -77,6 +76,6 @@ resource "google_iap_tunnel_instance_iam_member" "instance" {
   instance = "${var.company}-${var.env}-bastion-nfs"
   zone     = "${var.zone}"
   role     = "roles/iap.tunnelResourceAccessor"
-  member   = "user:alexandru@hey.com"
+  member   = "user:alex@hey.com"
   depends_on = [google_compute_instance.bastion-nfs]
 }

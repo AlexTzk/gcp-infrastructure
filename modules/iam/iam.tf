@@ -29,6 +29,50 @@ resource "google_service_account" "nfs_vm_service_account" {
   account_id   = "nfs-vm-service-account"
   display_name = "NFS VM Service Account"
 }
+locals {
+  nfs_sa_roles = [
+    "roles/artifactregistry.admin",     
+    "roles/run.admin",
+    "roles/iap.admin",
+    "roles/container.admin",
+    "roles/container.clusterAdmin",
+    "roles/iam.securityAdmin",
+    "roles/storage.admin",
+    "roles/storage.folderAdmin",
+    "roles/storage.objectAdmin",
+    "roles/compute.admin",
+    "roles/viewer"
+  ]
+}
+
+# Grant roles to Bastion NFS VM 
+resource "google_project_iam_member" "nfs_vm_service_account_roles" {
+  for_each = toset(local.nfs_sa_roles)
+  project  = var.project
+  role     = each.value
+  member   = "serviceAccount:${google_service_account.nfs_vm_service_account.email}"
+}
+
+# Service account for GKE workloads that need to connect to Cloud SQL 
+resource "google_service_account" "gke_cloudsql_sa" {
+  account_id   = "gke-cloudsql-sa"
+  display_name = "GKE Cloud SQL Service Account"
+}
+
+# Grant Cloud SQL Client permissions
+resource "google_project_iam_member" "gke_cloudsql_sa_binding" {
+  project = var.project
+  role    = "roles/cloudsql.client"
+  member  = "serviceAccount:${google_service_account.gke_cloudsql_sa.email}"
+}
+
+# Bind Cloud SQL SA to Workload idnetity
+resource "google_project_iam_member" "gke_cloudsql_sa_workload_binding" {
+  project = var.project
+  role    = "roles/iam.workloadIdentityUser"
+  member  = "serviceAccount:${var.project}.svc.id.goog[default/cloud-sql-proxy]"
+}
+
 
 # Service account for Bitbucket pipelines
 resource "google_service_account" "bitbucket_service_account" {
