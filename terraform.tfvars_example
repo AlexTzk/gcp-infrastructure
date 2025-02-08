@@ -31,3 +31,13 @@ db_password_1 = "awesomeuserpassword" # Create a password
 
 # GKE
 gke_cluster_ipv4_cidr = "10.11.0.0/21"
+vm_ip_cidr = "10.16.0.10/32"
+gke_cluster_ipv4_cidr = "10.11.0.0/21" # subnet used by pods
+gke_services_ipv4_cidr = "10.23.0.0/21" # subnet for gke services
+gke_num_nodes = 1 # number of gke nodes 
+min_node_count = 1 # minimum number of nodes
+max_node_count = 3 # max number of nodes
+gke_machine_type = "n2d-standard-4" # GCE backend VM hardware machine type
+authorized_networks = {
+  "10.16.0.0/22": "VPC subnet"
+}

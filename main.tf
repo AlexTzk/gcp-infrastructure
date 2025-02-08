@@ -103,3 +103,35 @@ module "gce" {
   privatenetwork_subnet                  =  module.network.privatenetwork_subnet
   depends_on                             = [module.network]
 }
+# GKE
+module "gke" {
+  source                                 = "./modules/gke"
+  company                                = "${var.company}"
+  project 				                       = "${var.project}"
+  env                                    = "${var.env}"
+  region                                 = "${var.region}"
+  zone                                   = "${var.zone}"
+  gke_num_nodes                          = "${var.gke_num_nodes}"
+  min_node_count                         = "${var.min_node_count}"
+  max_node_count                         = "${var.max_node_count}"
+  gke_machine_type                       = "${var.gke_machine_type}"
+  vm_ip_cidr                             = "${var.vm_ip_cidr}"
+  gke_cluster_ipv4_cidr                  = "${var.gke_cluster_ipv4_cidr}"
+  gke_master_ipv4_cidr                   = "${var.gke_master_ipv4_cidr}"
+  gke_services_ipv4_cidr                 = "${var.gke_services_ipv4_cidr}"
+  db_user_1                              = "${var.db_user_1}"
+  db_password_1                          = "${var.db_password_1}"
+  db_name 				                       = "${var.db_name}"
+  authorized_networks                    = "${var.authorized_networks}"
+  gke_cloudsql_sa                        =  module.iam.gke_sql_service_account
+  network_id                             =  module.network.network_id
+  privatenetwork_subnet                  =  module.network.privatenetwork_subnet
+}
+# Cloud Run 
+module "cr" {
+  source                                 = "./modules/cr"
+  company                                = "${var.company}"
+  project 				                       = "${var.project}"
+  env                                    = "${var.env}"
+  region                                 = "${var.region}"
+} 
