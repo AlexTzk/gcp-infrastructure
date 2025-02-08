@@ -24,7 +24,7 @@ resource "google_project_iam_custom_role" "bitbucket_role" {
   ]
 }
 
-# Service account for the Bastion NFS VM - limit scope for VM rather than use default compute SA
+# Service account for the Bastion NFS VM
 resource "google_service_account" "nfs_vm_service_account" {
   account_id   = "nfs-vm-service-account"
   display_name = "NFS VM Service Account"
