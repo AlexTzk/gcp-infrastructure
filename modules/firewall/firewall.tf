@@ -19,7 +19,7 @@ resource "google_compute_firewall" "allow-internal" {
   source_ranges = ["${var.pri_subnet_cidr}"]
 }
 
-# Allow traffic from LB for reverse proxy to GKE cluster
+# Allow traffic from LB for reverse proxy to GKE/other services
 resource "google_compute_firewall" "allow_tcp_loadbalancer" {
   name    = "allow-tcp-loadbalancer"
   network = "${var.network_id}"
@@ -36,18 +36,6 @@ resource "google_compute_firewall" "allow_tcp_loadbalancer" {
 
   direction = "INGRESS"
   priority  = 1000
-}
-
-# Enable HTTPS for exposing endpoints
-resource "google_compute_firewall" "allow-https" {
-  name    = "${var.company}-fw-allow-https"
-  network = "${var.network_id}"
-allow {
-    protocol = "tcp"
-    ports    = ["443"]
-  }
-  target_tags = ["allow-https"]
-  source_ranges = ["0.0.0.0/0"] 
 }
 
 # Allow GCP IAP ranges to Bastion SSH host access
