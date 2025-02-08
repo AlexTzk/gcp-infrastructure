@@ -50,6 +50,16 @@ GCP APIs needed for deploying this infrastructure are enabled at the beginning. 
 │   │   ├── outputs.tf
 │   │   ├── variables.tf
 │   │   └── vpc.tf
+│   ├── gke
+│   │   ├── outputs.tf
+│   │   ├── deployment.yaml
+│   │   ├── values.yaml
+│   │   ├── variables.tf
+│   │   └── gke.tf
+│   ├── cr
+│   │   ├── outputs.tf
+│   │   ├── variables.tf
+│   │   └── cr.tf
 │   ├── gce
 │   │   ├── outputs.tf
 │   │   ├── variables.tf
@@ -62,6 +72,7 @@ GCP APIs needed for deploying this infrastructure are enabled at the beginning. 
 ├── outputs.tf
 ├── plan_p1.json
 ├── plan_p2.json
+├── plan_p3.json
 ├── terraform.tfvars_example
 └── variables.tf
 ```
@@ -84,8 +95,11 @@ The content of this repository will be deployed into parts based on the release 
 ## Optional steps
 * You can download the plan_p*.json to review what infrastructure is deployed in each part. Upload the JSON file on [Hieven's visual terraform tool](https://hieven.github.io/terraform-visual/)
 ![image](https://github.com/user-attachments/assets/a3140c20-aa65-4ed2-9330-4efa6ffc6709)
-* Part Two
+* Part II
 ![image](https://github.com/user-attachments/assets/782458d7-a441-4974-853e-e543db05e3df)
+* Part III
+![image](https://github.com/user-attachments/assets/86fed02b-39db-4767-8a1a-1ff677ff8273)
+
 
 ## Contributing
 Contributions are welcome! If you’d like to make changes or improvements:
