@@ -21,3 +21,11 @@ variable "db_name" {}
 variable "db_user_1" {}
 variable "db_password_1" {}
 variable "vm_ip_nfs" {}
+variable "gke_num_nodes" {}
+variable "min_node_count" {}
+variable "max_node_count" {}
+variable "gke_machine_type" {}
+variable "vm_ip_cidr" {}
+variable "authorized_networks" {}
+variable "gke_master_ipv4_cidr" {}
+variable "gke_services_ipv4_cidr" {}
