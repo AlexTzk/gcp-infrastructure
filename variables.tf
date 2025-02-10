@@ -29,3 +29,4 @@ variable "vm_ip_cidr" {}
 variable "authorized_networks" {}
 variable "gke_master_ipv4_cidr" {}
 variable "gke_services_ipv4_cidr" {}
+

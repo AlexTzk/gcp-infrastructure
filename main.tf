@@ -135,3 +135,26 @@ module "cr" {
   env                                    = "${var.env}"
   region                                 = "${var.region}"
 } 
+# Load Balancers
+module "lbs" {
+  source                                 = "./modules/lbs"
+  company                                = "${var.company}"
+  env                                    = "${var.env}"
+  zone					                         = "${var.zone}"
+  project                                = "${var.project}"
+  region                                 = "${var.region}"
+  network_id				                     = module.network.network_id
+  lb_ip                                  = module.network.LB_IP
+  privatenetwork_subnet                  = module.network.privatenetwork_subnet
+  bs_depends_on                          = module.gke.helm_readiness
+}
+# Cloud IAP
+module "iap" {
+  source                                 = "./modules/iap"
+  company                                = "${var.company}"
+  env                                    = "${var.env}"
+  project                                = "${var.project}"
+  region                                 = "${var.region}"
+  zone 				                         	 = "${var.zone}"
+  privatenetwork_subnet                  = module.network.privatenetwork_subnet
+}

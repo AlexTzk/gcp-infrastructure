@@ -5,7 +5,7 @@ set -x
 LOGFILE="/var/log/startupscript.log"
 exec > >(sudo tee -a "$LOGFILE") 2>&1
 
-# Update and install 
+# Update and install
 sudo apt-get update -y
 sudo apt-get install -y nfs-kernel-server mdadm apt-transport-https ca-certificates gnupg curl
 
@@ -32,7 +32,7 @@ sudo systemctl restart nfs-kernel-server
 sudo exportfs -a
 sudo systemctl enable nfs-server
 
-# install Google Cloud SDK 
+# install Google Cloud SDK
 echo "Installing Google Cloud SDK and dependencies..."
 sudo apt-get install -y apt-transport-https ca-certificates gnupg curl
 
