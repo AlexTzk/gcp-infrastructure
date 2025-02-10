@@ -1,0 +1,9 @@
+variable "company" {}
+variable "env" {}
+variable "project" {}
+variable "region" {}
+variable "lb_ip" {}
+variable "zone" {}
+variable "network_id" {}
+variable "privatenetwork_subnet" {}
+variable "bs_depends_on" {}
