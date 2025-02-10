@@ -15,7 +15,7 @@ resource "google_container_cluster" "primary" {
   subnetwork = "${var.privatenetwork_subnet}"
 
   private_cluster_config {
-    enable_private_endpoint = true # true makes the public endpoint unreachable and private endpoint default
+    enable_private_endpoint = true # this makes the public endpoint unreachable and private endpoint default
     enable_private_nodes    = true 
     master_ipv4_cidr_block  = "${var.gke_master_ipv4_cidr}"
   }
@@ -64,7 +64,7 @@ resource "google_container_node_pool" "primary_nodes" {
   }
 }
 
-# retrieve cluster
+# Data Source to Retrieve Cluster Info
 data "google_container_cluster" "primary" {
   name     = google_container_cluster.primary.name
   location = var.zone
@@ -74,6 +74,7 @@ data "google_client_config" "default" {}
 
 # Configure the Kubernetes provider using the cluster info
 provider "kubernetes" {
+  # Prepend "https://" to ensure the host is a valid URL
   host = "https://${data.google_container_cluster.primary.endpoint}"
 
   cluster_ca_certificate = base64decode(
@@ -90,7 +91,7 @@ resource "kubernetes_service_account" "cloud_sql_proxy" {
     name      = "cloud-sql-proxy"
     namespace = "default"
     annotations = {
-      # Map the Kubernetes SA to Cloud SQL SA
+      # Map the Kubernetes SA to your Cloud SQL SA
       "iam.gke.io/gcp-service-account" = var.gke_cloudsql_sa
     }
   }
@@ -114,6 +115,7 @@ resource "kubernetes_secret" "postgres" {
 
   type = "Opaque"
 }
+
 # TLS secret
 resource "kubernetes_secret" "my-tls-cert" {
   metadata {
