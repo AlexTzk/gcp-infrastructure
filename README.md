@@ -1,6 +1,6 @@
 # GCP Infrastructure
 
-A repository for automating the deployment and management of Google Cloud Platform (GCP) resources. This project aims to provide a scalable, maintainable, and reproducible infrastructure setup using Infrastructure as Code (IaC) principles.
+A repository for automating the deployment and management of Google Cloud Platform (GCP) resources. This project aims to provide a scalable, maintainable, and reproducible infrastructure setup using Infrastructure as Code (IaC) principles. 
 
 ## Architecture Diagram
 ![Architecture](![Drawing 1](https://github.com/user-attachments/assets/6bd03cef-3aa7-4c54-93f9-165a025f7ddf)
@@ -25,6 +25,17 @@ This repository contains all the necessary files and scripts to provision resour
 - **Infrastructure as Code (IaC):** Ensuring reproducibility and version control.
 - **Modular Design:** Allowing each component to be managed and reused independently.
 - **Scalability and Maintainability:** Facilitating easy updates and rollbacks.
+
+## Features
+- **Private by default:** Ensuring no endpoints are exposed directly and every component is VPC native to a Private Subnet. Employing a GLOBAL HTTPS Load Balancer to proxy through HTTPS to our various Backends. Employing Cloud SQL Proxy and Service Account for GKE to PostgreSQL connectivity
+- **Predictable EGRESS** EGRESS is configured through a NAT Gateway that has one IP assigned to so we can easily whitelist this address to other Cloud Providers or OnPrem tools
+- **Scalable** Using Serverless and GKE to be able to scale effectively and quickly
+- **Versatility and Fast IO** Employing NFS shares on a RAID volume composed of NVMEs. This ensures very fast speeds for our GKE volumes.
+- **Bastion VM via Cloud IAP** One central point for managing all resources that's secured through Cloud Identity Aware Proxy
+- **Security** Minimal scope Firewall rules to not expose ports or endpoints unnecesarily
+- **High Availability** PostgreSQL and GKE cluster are highly available and resistant to zone failures
+- **Disaster Recovery** Disaster recovery and Business Continuity plan compliant with Point in Time Recovery
+
 
 By centralizing GCP infrastructure, you can rapidly spin up (or tear down) resources and track changes over time through Git. It also helps with Business continuity and Disaster recovery plans. 
 
@@ -54,6 +65,7 @@ GCP APIs needed for deploying this infrastructure are enabled at the beginning. 
 │   │   ├── outputs.tf
 │   │   ├── deployment.yaml
 │   │   ├── values.yaml
+│   │   ├── routes_test_deployment.yaml
 │   │   ├── variables.tf
 │   │   └── gke.tf
 │   ├── cr
@@ -65,6 +77,14 @@ GCP APIs needed for deploying this infrastructure are enabled at the beginning. 
 │   │   ├── variables.tf
 │   │   ├── startup_nfs.sh
 │   │   └── gce.tf
+│   ├── iap
+│   │   ├── outputs.tf
+│   │   ├── variables.tf
+│   │   └── iap.tf
+│   ├── lbs
+│   │   ├── outputs.tf
+│   │   ├── variables.tf
+│   │   └── lb.tf
 │   └── sql
 │       ├── outputs.tf
 │       ├── variables.tf
@@ -73,6 +93,7 @@ GCP APIs needed for deploying this infrastructure are enabled at the beginning. 
 ├── plan_p1.json
 ├── plan_p2.json
 ├── plan_p3.json
+├── plan_p4.json
 ├── terraform.tfvars_example
 └── variables.tf
 ```
@@ -97,8 +118,10 @@ The content of this repository will be deployed into parts based on the release 
 ![image](https://github.com/user-attachments/assets/a3140c20-aa65-4ed2-9330-4efa6ffc6709)
 * Part II
 ![image](https://github.com/user-attachments/assets/782458d7-a441-4974-853e-e543db05e3df)
-* Part III
+* Part III (too big to capture)
 ![image](https://github.com/user-attachments/assets/86fed02b-39db-4767-8a1a-1ff677ff8273)
+* Part IV (too big to capture)
+![image](https://github.com/user-attachments/assets/061fdde6-62b0-4225-82d0-399b954bfa27)
 
 
 ## Contributing
