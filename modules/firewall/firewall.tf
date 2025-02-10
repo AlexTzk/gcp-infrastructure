@@ -19,7 +19,7 @@ resource "google_compute_firewall" "allow-internal" {
   source_ranges = ["${var.pri_subnet_cidr}"]
 }
 
-# Allow traffic from LB for reverse proxy to GKE/other services
+# Allow traffic from LB for reverse proxy to GKE cluster
 resource "google_compute_firewall" "allow_tcp_loadbalancer" {
   name    = "allow-tcp-loadbalancer"
   network = "${var.network_id}"
