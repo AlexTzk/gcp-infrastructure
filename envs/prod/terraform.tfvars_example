@@ -1,0 +1,87 @@
+# General
+project = "your-prod-project-id"
+region  = "europe-west2"
+zone    = "europe-west2-a"
+env     = "prod"
+company = "mycompany"
+
+# Network
+network_name            = "mynet-prod"
+routing_mode            = "GLOBAL"
+description             = "production environment"
+mtu                     = 1460
+pri_subnet_cidr         = "10.36.0.0/22"
+pri_vpc_peering_address = "10.36.5.0/24"
+
+# PostgreSQL
+db_version           = "POSTGRES_16"
+db_tier              = "db-custom-4-16384"
+db_availability_type = "REGIONAL"
+db_disk_size         = 500
+db_disk_type         = "PD_SSD"
+db_point_recovery    = true
+db_deletion          = true
+db_name              = "myfirstdatabase"
+db_user_1            = "awesomeuser"
+
+# GKE
+gke_cluster_ipv4_cidr  = "10.31.0.0/21"
+gke_master_ipv4_cidr   = "172.16.2.0/28"
+gke_services_ipv4_cidr = "10.43.0.0/21"
+gke_num_nodes          = 3
+min_node_count         = 3
+max_node_count         = 6
+gke_machine_type       = "n2d-standard-8"
+vm_ip_cidr             = "10.36.0.10/32"
+gke_lb_target_tag      = "gke-lb-backend"
+
+authorized_networks = {
+  "10.36.0.0/22" = "Prod VPC subnet"
+}
+
+# Bastion / storage
+use_filestore = true
+
+bastion_internal_ip  = "10.36.0.10"
+nfs_internal_ip      = "10.36.0.20"
+bastion_machine_type = "e2-small"
+nfs_machine_type     = "e2-medium"
+
+nfs_data_disk_size_gb = 500
+nfs_data_disk_type    = "pd-ssd"
+
+filestore_tier        = "ZONAL"
+filestore_capacity_gb = 2048
+filestore_share_name  = "sharedfiles"
+
+# Access
+bastion_access_members = [
+  "user:alice@example.com",
+  "group:platform-admins@example.com"
+]
+
+frontend_access_members = [
+]
+
+# Bitbucket WIF
+bitbucket_workspace      = "your-workspace"
+bitbucket_workspace_uuid = "{your-workspace-uuid}"
+
+# Load balancer routing
+gke_hosts = [
+  "gke.example.com",
+  "gke2.example.com"
+]
+
+cloudrun_hosts = [
+  "app.example.com"
+]
+
+lb_certificate_domains = [
+  "gke.example.com",
+  "gke2.example.com",
+  "app.example.com"
+]
+
+# Artifact Registry
+artifact_registry_repository_id = "mycompany-prod-images"

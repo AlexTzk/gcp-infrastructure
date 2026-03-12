@@ -24,6 +24,23 @@ resource "google_project_iam_custom_role" "bitbucket_role" {
   ]
 }
 
+# bastion VM SA account
+resource "google_service_account" "bastion_vm_service_account" {
+  account_id   = "bastion-vm-service-account"
+  display_name = "Bastion VM Service Account"
+}
+
+# bastion VM privileges
+resource "google_project_iam_member" "bastion_vm_service_account_roles" {
+  for_each = toset([
+    "roles/logging.logWriter",
+    "roles/monitoring.metricWriter"
+  ])
+  project = var.project
+  role    = each.value
+  member  = "serviceAccount:${google_service_account.bastion_vm_service_account.email}"
+}
+
 # Service account for the Bastion NFS VM
 resource "google_service_account" "nfs_vm_service_account" {
   account_id   = "nfs-vm-service-account"
@@ -31,18 +48,32 @@ resource "google_service_account" "nfs_vm_service_account" {
 }
 locals {
   nfs_sa_roles = [
-    "roles/artifactregistry.admin",     
-    "roles/run.admin",
-    "roles/iap.admin",
-    "roles/container.admin",
-    "roles/container.clusterAdmin",
-    "roles/iam.securityAdmin",
-    "roles/storage.admin",
-    "roles/storage.folderAdmin",
-    "roles/storage.objectAdmin",
-    "roles/compute.admin",
-    "roles/viewer"
+    "roles/logging.logWriter",
+    "roles/monitoring.metricWriter"
   ]
+  bastion_human_roles = [
+      "roles/iap.tunnelResourceAccessor",
+      "roles/compute.osLogin",
+      "roles/compute.osAdminLogin"
+    ]
+}
+
+# dedicated google secret accessor for ESO
+resource "google_service_account" "external_secrets_sa" {
+  account_id   = "gke-external-secrets-sa"
+  display_name = "GKE External Secrets Operator SA"
+}
+
+resource "google_project_iam_member" "external_secrets_secret_accessor" {
+  project = var.project
+  role    = "roles/secretmanager.secretAccessor"
+  member  = "serviceAccount:${google_service_account.external_secrets_sa.email}"
+}
+
+resource "google_service_account_iam_member" "external_secrets_workload_binding" {
+  service_account_id = google_service_account.external_secrets_sa.name
+  role               = "roles/iam.workloadIdentityUser"
+  member             = "serviceAccount:${var.project}.svc.id.goog[external-secrets/external-secrets-sa]"
 }
 
 # Grant roles to Bastion NFS VM 
@@ -67,17 +98,24 @@ resource "google_project_iam_member" "gke_cloudsql_sa_binding" {
 }
 
 # Bind Cloud SQL SA to Workload idnetity
-resource "google_project_iam_member" "gke_cloudsql_sa_workload_binding" {
-  project = var.project
-  role    = "roles/iam.workloadIdentityUser"
-  member  = "serviceAccount:${var.project}.svc.id.goog[default/cloud-sql-proxy]"
+resource "google_service_account_iam_member" "gke_cloudsql_sa_workload_binding" {
+  service_account_id = google_service_account.gke_cloudsql_sa.name
+  role               = "roles/iam.workloadIdentityUser"
+  member             = "serviceAccount:${var.project}.svc.id.goog[default/cloud-sql-proxy]"
 }
-
 
 # Service account for Bitbucket pipelines
 resource "google_service_account" "bitbucket_service_account" {
   account_id   = "bitbucket-service-account"
   display_name = "Bitbucket Service Account"
+}
+
+# assign the group/members for the bastion vm
+resource "google_project_iam_binding" "bastion_human_access" {
+  for_each = toset(local.bastion_human_roles)
+  project  = var.project
+  role     = each.value
+  members  = var.bastion_access_members
 }
 
 # Assign the custom IAM role to the service account
@@ -95,18 +133,50 @@ resource "google_project_iam_binding" "bitbucket_role_binding_artifact" {
     "serviceAccount:${google_service_account.bitbucket_service_account.email}",
   ]
 }
-# Generate and download the service account key in JSON format
-resource "google_service_account_key" "bitbucket_service_account_key" {
-  service_account_id = google_service_account.bitbucket_service_account.name
-  public_key_type    = "TYPE_X509_PEM_FILE"
-  depends_on         = [google_service_account.bitbucket_service_account]
+
+# Workload identity pool for external CI/CD
+resource "google_iam_workload_identity_pool" "bitbucket_pool" {
+  workload_identity_pool_id = "${var.env}-bitbucket-pool"
+  display_name              = "Bitbucket Pipelines Pool"
+  description               = "OIDC trust for Bitbucket Pipelines"
+  disabled                  = false
 }
 
-# Store the service account key as a file
-resource "local_file" "bitbucket_service_account_key_file" {
-  filename = "${path.module}/${var.env}-${var.project}-bitbucket-service-account-key.json"
-  content  = google_service_account_key.bitbucket_service_account_key.private_key
-  depends_on = [google_service_account_key.bitbucket_service_account_key]
+# Workload identity for GKe <-> Secret manager
+resource "google_project_iam_member" "gke_cloudsql_sa_secret_accessor" {
+  project = var.project
+  role    = "roles/secretmanager.secretAccessor"
+  member  = "serviceAccount:${google_service_account.gke_cloudsql_sa.email}"
+}
+
+# OIDC provider for Bitbucket Pipelines
+resource "google_iam_workload_identity_pool_provider" "bitbucket_provider" {
+  workload_identity_pool_id          = google_iam_workload_identity_pool.bitbucket_pool.workload_identity_pool_id
+  workload_identity_pool_provider_id = "${var.env}-bitbucket-provider"
+  display_name                       = "Bitbucket OIDC Provider"
+  description                        = "OIDC provider for Bitbucket Pipelines"
+  disabled                           = false
+
+  attribute_mapping = {
+    "google.subject"       = "assertion.sub"
+    "attribute.repository" = "assertion.repositoryUuid"
+    "attribute.workspace"  = "assertion.workspaceUuid"
+    "attribute.branch"     = "assertion.branchName"
+  }
+
+  oidc {
+    issuer_uri = "https://api.bitbucket.org/2.0/workspaces/${var.bitbucket_workspace}/pipelines-config/identity/oidc"
+  }
+
+  attribute_condition = "attribute.workspace == \"${var.bitbucket_workspace_uuid}\""
+}
+
+# Allow identities from Bitbucket OIDC pool to impersonate the SA
+resource "google_service_account_iam_member" "bitbucket_wif_user" {
+  service_account_id = google_service_account.bitbucket_service_account.name
+  role               = "roles/iam.workloadIdentityUser"
+
+  member = "principalSet://iam.googleapis.com/${google_iam_workload_identity_pool.bitbucket_pool.name}/attribute.workspace/${var.bitbucket_workspace_uuid}"
 }
 
 # Custom IAM role for Frontend developer
@@ -128,15 +198,10 @@ resource "google_project_iam_custom_role" "frontend_role" {
   ]
 }
 
-/* Uncomment this to bind the custom example role created abocve - account must be registered with GCP
-# Assign the custom IAM roles 
+# frontend role assignment
 resource "google_project_iam_binding" "frontend_role_binding" {
-  project = "${var.project}"
+  count   = length(var.frontend_access_members) > 0 ? 1 : 0
+  project = var.project
   role    = google_project_iam_custom_role.frontend_role.name
-  members = [
-    "user:example@something.com",
-    "user:example@something.com",
-  ]
-  depends_on = [google_project_iam_custom_role.frontend_role]
+  members = var.frontend_access_members
 }
-*/

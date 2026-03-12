@@ -2,6 +2,6 @@ controller:
   service:
     type: ClusterIP
     annotations:
-      cloud.google.com/neg: '{"exposed_ports": {"443":{"name": "ingress-nginx-443-neg-https"}}}'
+      cloud.google.com/neg: '{"exposed_ports": {"80":{"name": "ingress-nginx-80-neg-http"}}}'
   config:
     use-forwarded-headers: "true"

@@ -1,8 +1,3 @@
-provider "google" {
-  project = var.project
-  region  = var.region
-}
-
 resource "google_cloud_run_v2_service" "frontend_app" {
   name     = "${var.env}-my-app"
   location = var.region
@@ -56,16 +51,3 @@ resource "google_cloud_run_v2_service" "frontend_app" {
 
    policy_data = data.google_iam_policy.noauth.policy_data
  }
-
-resource "google_project_service" "artifact_registry" {
-  project = "${var.project}"
-  service = "artifactregistry.googleapis.com"
-  disable_on_destroy = false
-}
-
-resource "google_artifact_registry_repository" "my-app" {
-  repository_id = "${var.env}-my-app"
-  project       = "${var.project}"
-  location      = "${var.region}"
-  format        = "DOCKER"
-}

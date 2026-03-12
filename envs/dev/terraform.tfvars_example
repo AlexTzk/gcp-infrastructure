@@ -1,0 +1,88 @@
+# General
+project = "your-project-id"
+region  = "europe-west2"
+zone    = "europe-west2-a"
+env     = "dev"
+company = "mycompany"
+
+# Network
+network_name            = "mynet"
+routing_mode            = "GLOBAL"
+description             = "dev environment"
+mtu                     = 1460
+pri_subnet_cidr         = "10.16.0.0/22"
+pri_vpc_peering_address = "10.16.5.0/24"
+
+# PostgreSQL
+db_version           = "POSTGRES_16"
+db_tier              = "db-custom-2-7680"
+db_availability_type = "REGIONAL"
+db_disk_size         = 250
+db_disk_type         = "PD_SSD"
+db_point_recovery    = true
+db_deletion          = false
+db_name              = "myfirstdatabase"
+db_user_1            = "awesomeuser"
+
+# GKE
+gke_cluster_ipv4_cidr  = "10.11.0.0/21"
+gke_master_ipv4_cidr   = "172.16.0.0/28"
+gke_services_ipv4_cidr = "10.23.0.0/21"
+gke_num_nodes          = 1
+min_node_count         = 1
+max_node_count         = 3
+gke_machine_type       = "n2d-standard-4"
+vm_ip_cidr             = "10.16.0.10/32"
+gke_lb_target_tag      = "gke-lb-backend"
+
+authorized_networks = {
+  "10.16.0.0/22" = "VPC subnet"
+}
+
+# Bastion / storage
+use_filestore = false
+
+bastion_internal_ip  = "10.16.0.10"
+nfs_internal_ip      = "10.16.0.20"
+bastion_machine_type = "e2-micro"
+nfs_machine_type     = "e2-small"
+
+nfs_data_disk_size_gb = 200
+nfs_data_disk_type    = "pd-ssd"
+
+filestore_tier        = "BASIC_HDD"
+filestore_capacity_gb = 1024
+filestore_share_name  = "sharedfiles"
+
+# Access
+bastion_access_members = [
+  "user:alice@example.com",
+  "group:platform-admins@example.com"
+]
+
+frontend_access_members = [
+
+]
+
+# Bitbucket WIF
+bitbucket_workspace      = "your-workspace"
+bitbucket_workspace_uuid = "{your-workspace-uuid}"
+
+# Load balancer routing
+gke_hosts = [
+  "gke.example.com",
+  "gke2.example.com"
+]
+
+cloudrun_hosts = [
+  "app.example.com"
+]
+
+lb_certificate_domains = [
+  "gke.example.com",
+  "gke2.example.com",
+  "app.example.com"
+]
+
+# Artifact Registry
+artifact_registry_repository_id = "mycompany-dev-images"
