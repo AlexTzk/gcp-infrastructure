@@ -23,7 +23,8 @@ This is not trying to be the cheapest possible setup, and it is not trying to be
 
 ---
 ## Architecture visualization
-![Infrastructure Diagram](docs/terraform-infrastructure-diagram.svg)
+![Infrastructure Terraform Diagram](docs/terraform-infrastructure-diagram.svg)
+![Infrastructure GCP Diagram](docs/gcp_infra.png)
 
 ### Viewing the diagram on your computer 
 - for ease of access, you can clone the repository locally, then use the following command to see an interactive architectural diagram: 

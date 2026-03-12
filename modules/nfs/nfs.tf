@@ -18,7 +18,7 @@ resource "google_compute_resource_policy" "nfs_daily_snapshots" {
 
     snapshot_properties {
       guest_flush       = false
-      storage_locations = [substr(var.region, 0, length(var.region) - 2)]
+      storage_locations = [var.region]
       labels = {
         env     = var.env
         company = var.company

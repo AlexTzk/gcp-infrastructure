@@ -11,7 +11,7 @@ routing_mode            = "GLOBAL"
 description             = "production environment"
 mtu                     = 1460
 pri_subnet_cidr         = "10.36.0.0/22"
-pri_vpc_peering_address = "10.36.5.0/24"
+pri_vpc_peering_address = "10.36.5.0"
 
 # PostgreSQL
 db_version           = "POSTGRES_16"

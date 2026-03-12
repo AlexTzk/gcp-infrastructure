@@ -97,11 +97,6 @@ variable "pri_subnet_cidr" {
 variable "pri_vpc_peering_address" {
   description = "CIDR range reserved for Private Service Access / VPC peering."
   type        = string
-
-  validation {
-    condition     = can(cidrhost(var.pri_vpc_peering_address, 0))
-    error_message = "pri_vpc_peering_address must be a valid CIDR block."
-  }
 }
 
 variable "gke_cluster_ipv4_cidr" {
